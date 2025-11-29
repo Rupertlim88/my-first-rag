@@ -11,6 +11,7 @@ I like to travel and have a lot of attractions I want to tick off (I have a spre
 Simple RAG
 
 ```mermaid
+graph TD
     A[User<br/>(frontend)] --> B[FastAPI Backend<br/>(/ask endpoint)]
     B --> C[Pseudo VectorDB<br/>(Supabase)]
     C --> D[RAG Flow<br/>- Retrieve similar attractions<br/>- Build LLM prompt<br/>- Call OpenAI LLM]
