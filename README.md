@@ -13,10 +13,10 @@ Simple RAG
 ```mermaid
 graph TD
     A[User] --> B[FastAPI Backend - /ask endpoint]
-    B --> C[Supabase (Pseudo Vector DB)]
-    C --> D[RAG Flow: Retrieve similar items → Build LLM prompt → Call OpenAI API]
-    D --> B[LLM Response]
-    B --> A[Final Answer]
+    B --> C["Supabase (Pseudo Vector DB)"]
+    C --> D["RAG Flow: retrieve similar attractions, build LLM prompt, call OpenAI LLM"]
+    D --> B
+    B --> A
 ```
 **Flow:**  
 User sends a query from the frontend → FastAPI backend receives it → Backend queries the pseudo vector DB for similar attractions → RAG logic creates a context prompt and calls the LLM → Response goes back to the user.
