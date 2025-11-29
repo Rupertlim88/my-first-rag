@@ -12,9 +12,9 @@ Simple RAG
 
 ```mermaid
 graph TD
-    A[User<br/>(frontend)] --> B[FastAPI Backend<br/>(/ask endpoint)]
-    B --> C[Pseudo VectorDB<br/>(Supabase)]
-    C --> D[RAG Flow<br/>- Retrieve similar attractions<br/>- Build LLM prompt<br/>- Call OpenAI LLM]
+    A[User] --> B[FastAPI Backend(/ask endpoint)]
+    B --> C[Pseudo VectorDB (Supabase)]
+    C --> D[RAG Flow: Retrieve similar attractions --> Build LLM prompt --> Call OpenAI LLM]
     D --> B
     B --> A
 ```
