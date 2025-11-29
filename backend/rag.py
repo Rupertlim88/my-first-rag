@@ -16,32 +16,47 @@ import logging
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 
-from sentence_transformers import SentenceTransformer
+import numpy as np
+from huggingface_hub import InferenceClient
 from openai import OpenAI
 from supabase import Client
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
-# Lazy-loaded embedding model for query text
-embedding_model: Optional[SentenceTransformer] = None
+# Hugging Face Inference API configuration
+HF_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+
+# Lazy-loaded Hugging Face Inference client
+hf_client: Optional[InferenceClient] = None
 
 
-def get_embedding_model() -> SentenceTransformer:
+def get_hf_client() -> InferenceClient:
     """
-    Return a shared SentenceTransformer model instance for computing query embeddings.
+    Return a shared InferenceClient instance for computing query embeddings.
     
-    The model is loaded lazily on first use and reused for subsequent calls.
+    The client is initialized lazily on first use and reused for subsequent calls.
+    
+    Raises:
+        RuntimeError: If HF_TOKEN is not set.
     """
-    global embedding_model
-    if embedding_model is None:
+    global hf_client
+    if hf_client is None:
+        hf_token = os.environ.get("HF_TOKEN")
+        if not hf_token:
+            msg = "HF_TOKEN environment variable is not set"
+            logger.error(msg)
+            raise RuntimeError(msg)
         try:
-            embedding_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
-            logger.info("Loaded SentenceTransformer model for query embeddings")
+            hf_client = InferenceClient(
+                provider="hf-inference",
+                api_key=hf_token,
+            )
+            logger.info("Initialized Hugging Face InferenceClient for embeddings")
         except Exception as exc:
-            logger.error(f"Failed to load SentenceTransformer model: {exc}")
+            logger.error(f"Failed to initialize Hugging Face InferenceClient: {exc}")
             raise
-    return embedding_model
+    return hf_client
 
 
 def get_openai_client() -> OpenAI:
@@ -61,18 +76,45 @@ def get_openai_client() -> OpenAI:
 
 def get_query_embedding(user_query: str) -> List[float]:
     """
-    Compute an embedding vector for the given user query text.
+    Compute an embedding vector for the given user query text using Hugging Face Inference API.
     
     Args:
         user_query: Raw text query from the user.
         
     Returns:
         List of floats representing the embedding vector.
+        
+    Raises:
+        RuntimeError: If HF_TOKEN is not set or API call fails.
     """
-    model = get_embedding_model()
-    # SentenceTransformer.encode returns a numpy array; convert to plain list
-    embedding = model.encode(user_query)
-    return embedding.tolist()
+    client = get_hf_client()
+    
+    try:
+        result = client.feature_extraction(
+            user_query,
+            model=HF_EMBEDDING_MODEL,
+        )
+        
+        # Handle different response formats
+        # Convert numpy array to list if needed
+        if isinstance(result, np.ndarray):
+            result = result.tolist()
+        
+        if isinstance(result, list):
+            # If it's a list of lists (batch), take the first one
+            if len(result) > 0 and isinstance(result[0], list):
+                result = result[0]
+            return [float(x) for x in result]
+        elif isinstance(result, (int, float)):
+            # Single value (unlikely but handle it)
+            return [float(result)]
+        else:
+            logger.error(f"Unexpected embedding response format: {type(result)}")
+            raise ValueError(f"Unexpected embedding response format: {type(result)}")
+            
+    except Exception as exc:
+        logger.error(f"Error getting embedding from Hugging Face API: {exc}", exc_info=True)
+        raise RuntimeError(f"Failed to get embedding: {str(exc)}")
 
 
 def get_similarities(supabase: Client, user_query: str, max_matches: int = 10) -> List[Dict]:
