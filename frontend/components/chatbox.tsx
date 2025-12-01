@@ -74,7 +74,7 @@ export default function Chatbox({
                     className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`border-4 border-black p-4 max-w-md shadow-[4px_4px_0_rgba(0,0,0,1)] ${
+                      className={`border-4 border-black p-5 max-w-md shadow-[4px_4px_0_rgba(0,0,0,1)] ${
                         message.role === "user"
                           ? "bg-white"
                           : "bg-[#D32F2F] text-white"
@@ -94,18 +94,60 @@ export default function Chatbox({
                         <div className="font-bold text-sm leading-relaxed">
                           <ReactMarkdown
                             components={{
-                              p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
-                              ul: ({ children }) => <ul className="list-disc mb-3 space-y-2 ml-4">{children}</ul>,
-                              ol: ({ children }) => <ol className="list-decimal mb-3 space-y-2 ml-4">{children}</ol>,
-                              li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-                              strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-                              em: ({ children }) => <em className="italic">{children}</em>,
-                              code: ({ children }) => <code className="bg-white/20 px-1.5 py-0.5 rounded text-xs font-mono border border-white/30">{children}</code>,
-                              h1: ({ children }) => <h1 className="text-base font-bold mb-2 mt-3 first:mt-0">{children}</h1>,
-                              h2: ({ children }) => <h2 className="text-sm font-bold mb-2 mt-3 first:mt-0">{children}</h2>,
-                              h3: ({ children }) => <h3 className="text-sm font-bold mb-1 mt-2 first:mt-0">{children}</h3>,
-                              blockquote: ({ children }) => <blockquote className="border-l-4 border-white/40 pl-3 italic my-2 bg-white/10 py-1">{children}</blockquote>,
-                              hr: () => <hr className="border-white/30 my-3" />,
+                              p: ({ children }) => <p className="mb-5 last:mb-0 text-white/95">{children}</p>,
+                              ul: ({ children }) => <ul className="list-none mb-5 space-y-3 ml-0">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-none mb-5 space-y-3 ml-0">{children}</ol>,
+                              li: ({ children }) => {
+                                // Convert children to string to check content
+                                const content = typeof children === 'string' 
+                                  ? children 
+                                  : Array.isArray(children) 
+                                    ? children.map(c => typeof c === 'string' ? c : '').join('')
+                                    : String(children);
+                                
+                                // Check if this is a bullet with practical info (contains "Hours:" or "Location:")
+                                const isPracticalInfo = content.includes("Hours:") || content.includes("Location:");
+                                
+                                return (
+                                  <li className={`leading-relaxed mb-2 pl-0 ${isPracticalInfo ? 'text-white/85 text-xs font-normal' : 'text-white/95 font-bold'}`}>
+                                    <span className="text-white/70 font-bold mr-2">•</span>
+                                    {children}
+                                  </li>
+                                );
+                              },
+                              strong: ({ children }) => (
+                                <strong className="font-bold text-base text-white block mb-3 mt-5 first:mt-0 leading-tight">
+                                  {children}
+                                </strong>
+                              ),
+                              em: ({ children }) => <em className="italic text-white/90">{children}</em>,
+                              code: ({ children }) => (
+                                <code className="bg-white/20 px-1.5 py-0.5 rounded text-xs font-mono border border-white/30 text-white/90">
+                                  {children}
+                                </code>
+                              ),
+                              h1: ({ children }) => (
+                                <h1 className="text-base font-bold mb-3 mt-6 first:mt-0 text-white">
+                                  {children}
+                                </h1>
+                              ),
+                              h2: ({ children }) => (
+                                <h2 className="text-sm font-bold mb-2 mt-5 first:mt-0 text-white">
+                                  {children}
+                                </h2>
+                              ),
+                              h3: ({ children }) => (
+                                <h3 className="text-sm font-bold mb-1 mt-4 first:mt-0 text-white">
+                                  {children}
+                                </h3>
+                              ),
+                              blockquote: ({ children }) => (
+                                <blockquote className="border-l-4 border-white/40 pl-3 italic my-3 bg-white/10 py-2 text-white/90">
+                                  {children}
+                                </blockquote>
+                              ),
+                              hr: () => <hr className="border-white/20 my-5" />,
+                              br: () => <br className="mb-1" />,
                             }}
                           >
                             {message.content}
