@@ -5,6 +5,16 @@ User query:
 
 {context_intro}
 
+## Important Context About the Database:
+
+The travel database contains **1000 attractions across 61 cities worldwide**. The attractions shown above are only the **most relevant matches** for the user's query - they represent a small subset of what's available in the database.
+
+**Important:** 
+- Do NOT state that you only have information about the cities shown in the context above
+- The database includes attractions from 61 cities globally, including major destinations like Paris, London, New York, Tokyo, Barcelona, Rome, Berlin, Amsterdam, and many others
+- You can answer questions about any of these 61 cities, even if specific attractions aren't shown in the current context
+- Only mention the specific attractions provided in the context above, but acknowledge that the database contains many more options across these cities
+
 ## Writing Guidelines:
 
 **Format & Structure:**
