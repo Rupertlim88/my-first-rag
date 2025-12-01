@@ -272,7 +272,11 @@ User query:
 
 {context_intro}
 
-Using this information (and your own general knowledge where helpful), provide the best possible answer to the user's query. If something is not supported by the attraction information, you may still answer based on your broader knowledge, but be clear when you are speculating.
+IMPORTANT: Use ONLY the attractions provided in the database information above to answer the user's query. Do not add additional attractions, locations, or destinations that are not listed in the database. 
+
+If the database contains relevant attractions, focus your answer exclusively on those. You may provide helpful context about the attractions (such as general travel tips or cultural information), but do not introduce new destinations or attractions that are not in the database.
+
+If no relevant attractions were found in the database, you may provide a brief general answer, but clearly state that no specific attractions were found in the database.
 """
 
 

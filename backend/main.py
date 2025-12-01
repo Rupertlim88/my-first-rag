@@ -71,32 +71,6 @@ app.add_middleware(
 
 
 # Pydantic models
-class SearchRequest(BaseModel):
-    """Request model for search endpoint."""
-    query_embedding: List[float] = Field(
-        ...,
-        description="The embedding vector of the query"
-    )
-    match_count: Optional[int] = Field(
-        default=2,
-        ge=1,
-        le=10,
-        description="Number of similar items to fetch (1-10, default: 2)"
-    )
-
-
-class MatchItem(BaseModel):
-    """Model for a single match result."""
-    id: int
-    content: str
-    similarity: Optional[float] = None
-
-
-class SearchResponse(BaseModel):
-    """Response model for search endpoint."""
-    matches: List[MatchItem]
-
-
 class QueryRequest(BaseModel):
     """Request model for free-text question answering."""
     query: str
@@ -120,7 +94,7 @@ async def root():
         "message": "Vector Similarity Search API",
         "status": "running",
         "endpoints": {
-            "search": "/search (POST)"
+            "ask": "/ask (POST)"
         }
     }
 
@@ -129,79 +103,6 @@ async def root():
 async def health():
     """Health check endpoint."""
     return {"status": "healthy"}
-
-
-
-
-@app.post("/search", response_model=SearchResponse)
-async def search(request: SearchRequest):
-    """
-    Search for similar documents using vector embeddings.
-    
-    Args:
-        request: SearchRequest containing query_embedding and optional match_count
-        
-    Returns:
-        SearchResponse with list of matching documents
-        
-    Raises:
-        HTTPException: If Supabase query fails or returns an error
-    """
-    # Ensure match_count is within bounds (default 2, max 10)
-    match_count = request.match_count if request.match_count is not None else 2
-    match_count = min(max(match_count, 1), 10)  # Clamp between 1 and 10
-    
-    logger.info(f"Search request received: match_count={match_count}, embedding_dim={len(request.query_embedding)}")
-    
-    try:
-        # Call Supabase RPC function
-        response = supabase.rpc(
-            "match_documents",
-            {
-                "query_embedding": request.query_embedding,
-                "match_count": match_count
-            }
-        ).execute()
-        
-        # Check if response has data
-        if not hasattr(response, 'data') or response.data is None:
-            logger.warning("Supabase RPC returned no data")
-            return SearchResponse(matches=[])
-        
-        # Process the response data
-        matches = []
-        for item in response.data:
-            # Convert item to dict if it's not already
-            if not isinstance(item, dict):
-                item = dict(item) if hasattr(item, '__dict__') else {}
-            
-            # Extract similarity if present (could be 'similarity', 'distance', etc.)
-            similarity = item.get('similarity')
-            if similarity is None:
-                # Try alternative field names
-                similarity = item.get('distance')
-            
-            # Build match item - handle missing fields gracefully
-            match_data = {
-                'id': item.get('id'),
-                'content': item.get('content', ''),
-            }
-            if similarity is not None:
-                match_data['similarity'] = float(similarity)
-            
-            match_item = MatchItem(**match_data)
-            matches.append(match_item)
-        
-        logger.info(f"Search completed: found {len(matches)} matches")
-        return SearchResponse(matches=matches)
-    
-    except Exception as e:
-        error_msg = f"Error querying Supabase: {str(e)}"
-        logger.error(error_msg, exc_info=True)
-        raise HTTPException(
-            status_code=500,
-            detail=error_msg
-        )
 
 
 @app.post("/ask", response_model=AnswerResponse)
