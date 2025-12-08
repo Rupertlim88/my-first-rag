@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       <RAG
-        apiUrl={process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}
+        apiUrl={process.env.NEXT_PUBLIC_API_URL || "https://firstragapp.rupertlim.com"}
         topN={3}
         initialMessages={[]}
       />

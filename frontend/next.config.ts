@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   // Enable environment variable validation
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "https://firstragapp.rupertlim.com",
   },
 };
 

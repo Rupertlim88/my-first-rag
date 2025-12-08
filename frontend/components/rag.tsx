@@ -10,7 +10,7 @@ interface RAGProps {
 }
 
 export default function RAG({
-  apiUrl = "http://localhost:8000",
+  apiUrl = "https://firstragapp.rupertlim.com",
   topN = 3,
   initialMessages = [],
 }: RAGProps) {
