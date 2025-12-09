@@ -41,8 +41,10 @@ export default function RAG({
     setError(null);
 
     try {
+      // Normalize API URL by removing trailing slashes to prevent double slashes in fetch URLs
+      const normalizedApiUrl = apiUrl.replace(/\/+$/, "");
       // Call the backend /ask endpoint
-      const response = await fetch(`${apiUrl}/ask`, {
+      const response = await fetch(`${normalizedApiUrl}/ask`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
