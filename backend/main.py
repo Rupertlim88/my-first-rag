@@ -63,7 +63,14 @@ app = FastAPI(
 # Configure CORS to allow frontend requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://firstragapp.rupertlim.com", "http://localhost:3000", "http://localhost:3001", "https://my-first-rag-drab.vercel.app"],  # Next.js default ports
+    allow_origins=[
+        "https://firstragapp.rupertlim.com",
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://my-first-rag-drab.vercel.app",
+        "https://frontend-my-first-rag.vercel.app",
+        "https://frontend-my-first-mqe864ctf-rupert-ls-projects.vercel.app",
+    ],  # Next.js default ports and Vercel deployments
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
