@@ -75,6 +75,8 @@ app.add_middleware(
         "https://frontend-my-first-rag-rupert-ls-projects.vercel.app",
     ],  # Next.js default ports and Vercel deployments
     allow_credentials=False,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
